@@ -249,6 +249,6 @@ export default function App(){
   </section>}
   <div className="trust-grid"><div><Icon name="shield"/><span><b>بدون آپلود</b><small>پردازش کامل در مرورگر</small></span></div><div><Icon name="globe"/><span><b>کشورها و پرچم‌ها</b><small>کدهای ISO و ترجمه فارسی</small></span></div><div><Icon name="check"/><span><b>Check Digit</b><small>اعتبارسنجی استاندارد 7-3-1</small></span></div></div>
   <div className="disclaimer"><Icon name="alert"/><span>نتیجه بررسی Check Digit یا نشان «Format checked» فقط به ساختار MRZ اشاره دارد و هیچ اصالت‌سنجی، تأیید هویت، صحت مدرک فیزیکی یا ارزیابی پایگاه‌های رسمی انجام نمی‌دهد. کارت پیش‌نمایش فقط نمونه آموزشی است.</span></div>
-  <footer className="footer"><span>MRZ Tools · ساخته‌شده توسط <a href="https://mehrdad32.ir/" target="_blank" rel="noreferrer">Mehrdad32</a></span><div><a href="https://github.com/Mehrdad32/MrzTools" target="_blank" rel="noreferrer">GITHUB / SOURCE</a><span>·</span><a href="https://tarikhdaar.mehrdad32.ir/" target="_blank" rel="noreferrer">تاریخ‌دار</a></div></footer>
+  <footer className="footer"><span>MRZ Tools · ساخته‌شده توسط <a href="https://mehrdad32.ir/" target="_blank" rel="noreferrer">Mehrdad32</a></span><div><a href="https://github.com/Mehrdad32/MrzTools" target="_blank" rel="noreferrer">GITHUB / SOURCE</a><span>·</span><a href="https://mehrdad32.ir/fa/projects" target="_blank" rel="noreferrer">سایر پروژه‌ها</a></div></footer>
  </main>
 }
