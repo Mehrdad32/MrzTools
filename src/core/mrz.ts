@@ -44,7 +44,6 @@ export function normalizeMRZ(text:string) {
   return text.toUpperCase().replace(/[\u200c\u200d\r]/g,'').trim()
     .split('\n').map(line => line.replace(/\s/g,'')).filter(Boolean)
 }
-const lengths:Record<Format,[number,number]> = {TD1:[3,30],TD2:[2,36],TD3:[2,44]}
 export function detectFormat(lines:string[]): Format | null {
   if(lines.length===3 && lines.every(x=>x.length===30))return 'TD1'
   if(lines.length===2 && lines.every(x=>x.length===36))return 'TD2'
