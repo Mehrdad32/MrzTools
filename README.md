@@ -22,8 +22,7 @@ All MRZ data and pictures are processed in the browser; no upload or API. Do not
 The transliteration of real names is not automatic; names must be Latin. MRV-A and MRV-B are outside v1 scope.
 
 ## OCR-B font
-A genuine OCR-B typeface is loaded from Raisty OCR-B (OFL-1.1), versioned jsDelivr: https://github.com/raisty/OCR-B
-If the font CDN cannot be reached, monospace fallback is used. The font has its own SIL OFL license; its creator and license should be preserved in any font redistribution.
+A genuine OCR-B typeface from the Raisty OCR-B project (SIL OFL-1.1) is downloaded from the pinned upstream commit during production builds and self-hosted at /fonts/OCR-B.ttf, along with its license in /fonts/OFL.txt. Upstream source: https://github.com/jaycee723/ocr-b . The site does not make third-party requests to load the font. It remains separately licensed from this MIT application.
 
 ## Development
 Node.js 22+. Run: npm install; npm test; npm run build; npm run dev.
