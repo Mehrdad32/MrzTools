@@ -67,6 +67,59 @@ function downloadData(content:string,name:string,type:string){
  const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove()
  window.setTimeout(()=>URL.revokeObjectURL(url),2000)
 }
+
+async function exportSampleCard(data:ParsedMRZ,photo:string|null){
+  const canvas=document.createElement('canvas')
+  canvas.width=1200; canvas.height=760
+  const ctx=canvas.getContext('2d')
+  if(!ctx)throw new Error('مرورگر از Canvas پشتیبانی نمی‌کند.')
+  const grad=ctx.createLinearGradient(0,0,1200,760)
+  grad.addColorStop(0,'#163a31');grad.addColorStop(.55,'#0c2420');grad.addColorStop(1,'#081411')
+  ctx.fillStyle=grad;ctx.fillRect(0,0,1200,760)
+  ctx.strokeStyle='rgba(167,243,208,.4)';ctx.lineWidth=3;ctx.strokeRect(24,24,1152,712)
+  ctx.font='bold 37px sans-serif';ctx.fillStyle='#d1fae5';ctx.fillText('MRZ TOOLS / LABORATORY',56,91)
+  ctx.font='17px monospace';ctx.fillStyle='#8bb9a8';ctx.fillText('SYNTHETIC TRAINING PREVIEW - NOT A GOVERNMENT DOCUMENT',56,130)
+  ctx.strokeStyle='rgba(167,243,208,.22)';ctx.beginPath();ctx.moveTo(56,154);ctx.lineTo(1144,154);ctx.stroke()
+  ctx.fillStyle='#1b453b';ctx.fillRect(56,186,245,278)
+  if(photo){
+    const img=new Image();img.src=photo
+    try{
+      await new Promise<void>((resolve,reject)=>{img.onload=()=>resolve();img.onerror=()=>reject(new Error('عکس خوانده نشد.'))})
+      const scale=Math.max(245/img.width,278/img.height)
+      const sw=245/scale,sh=278/scale
+      ctx.drawImage(img,(img.width-sw)/2,(img.height-sh)/2,sw,sh,56,186,245,278)
+    }catch{ /* no photo: export the clean placeholder */ }
+  }
+  ctx.fillStyle='rgba(70,10,12,.8)';ctx.fillRect(56,424,245,40)
+  ctx.textAlign='center';ctx.font='bold 22px sans-serif';ctx.fillStyle='#fecaca';ctx.fillText('NOT AN ID',179,452);ctx.textAlign='left'
+  ctx.fillStyle='#95c6b5';ctx.font='17px monospace';ctx.fillText('HOLDER / DISPLAY NAME',330,216)
+  ctx.fillStyle='#effff7';ctx.font='bold 34px sans-serif';ctx.fillText((data.givenNames+' '+data.surname).slice(0,50),330,260,815)
+  const info=[['DOCUMENT NO.',data.documentNumber],['NATIONALITY',data.nationality],['DATE OF BIRTH',data.birthISO||'-'],['DATE OF EXPIRY',data.expiryISO||'-']]
+  info.forEach(([label,value],i)=>{
+    const col=i%2,row=Math.floor(i/2)
+    const x=330+col*385,y=334+row*93
+    ctx.font='15px monospace';ctx.fillStyle='#8bb7a8';ctx.fillText(label,x,y)
+    ctx.font='bold 24px monospace';ctx.fillStyle='#effff7';ctx.fillText(value,x,y+34)
+  })
+  ctx.strokeStyle='rgba(167,243,208,.18)';ctx.beginPath();ctx.moveTo(56,495);ctx.lineTo(1144,495);ctx.stroke()
+  try{await document.fonts.load('25px "MRZ OCR-B"')}catch{ /* use fallback */ }
+  ctx.font='25px "MRZ OCR-B",monospace';ctx.fillStyle='#c5ffe4'
+  data.lines.forEach((line,i)=>ctx.fillText(line,58,548+i*39,1082))
+  ctx.save();ctx.translate(575,358);ctx.rotate(-Math.PI/12);ctx.textAlign='center'
+  ctx.font='bold 79px sans-serif';ctx.fillStyle='rgba(253,164,175,.23)'
+  ctx.fillText('SAMPLE · NOT VALID',0,0);ctx.restore()
+  ctx.font='bold 16px monospace';ctx.fillStyle='#a7f3d0'
+  ctx.fillText('FORMAT CHECKED BY MEHRDAD32 MRZ TOOLS',56,706)
+  ctx.textAlign='right';ctx.fillStyle='#fda4af';ctx.fillText('NOT PROOF OF IDENTITY',1143,706)
+  await new Promise<void>((resolve,reject)=>canvas.toBlob(blob=>{
+    if(!blob){reject(new Error('ساخت فایل PNG ممکن نشد.'));return}
+    const url=URL.createObjectURL(blob)
+    const a=document.createElement('a');a.href=url;a.download='MRZ-Tools-SAMPLE.png'
+    document.body.appendChild(a);a.click();a.remove()
+    window.setTimeout(()=>URL.revokeObjectURL(url),2500);resolve()
+  },'image/png'))
+}
+
 function Field({title,children,detail}:{title:string,children:React.ReactNode,detail?:string}){
  return <label className="form-field"><span>{title}</span>{children}{detail&&<small>{detail}</small>}</label>
 }
@@ -176,6 +229,7 @@ export default function App(){
        <div className="section-heading">کارت آموزشی <span>VISUAL SIMULATOR</span></div>
        <div className="photo-controls"><input type="file" ref={photoRef} accept="image/png,image/jpeg,image/webp" onChange={e=>selectPhoto(e.target.files?.[0])} className="hidden-input"/><button className="secondary-button" type="button" onClick={()=>photoRef.current?.click()}><Icon name="photo"/> افزودن عکس محلی</button>{photo&&<button className="minor-button" onClick={()=>setPhoto(null)}>حذف عکس</button>}</div>
        <DemoCard data={generatedParsed} photo={photo}/>
+       <div className="actions"><button type="button" className="secondary-button" onClick={()=>void exportSampleCard(generatedParsed,photo).catch(e=>setError(e instanceof Error?e.message:'خروجی PNG ساخته نشد.'))}><Icon name="download"/> دانلود کارت آزمایشی PNG</button></div>
        <p className="hint">پیش‌نمایش با واترمارک دائمی SAMPLE و هویت بصری اختصاصی؛ فاقد نشان یا قالب رسمی دولت‌ها است.</p>
      </div>:<div className="empty-view"><div className="empty-icon"><Icon name="upload"/></div><strong>استودیوی ساخت MRZ</strong><p>فرم سمت راست را کامل کن تا MRZ و کارت آزمایشگاهی با فونت OCR-B ساخته شوند.</p><small>DESIGN / TRAINING / SIMULATION</small></div>}
     </div>
